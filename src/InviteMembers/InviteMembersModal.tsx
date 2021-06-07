@@ -8,6 +8,7 @@ import {
   Heading,
   Text,
 } from '@chakra-ui/react'
+import { InviteForm } from './InviteForm'
 
 interface InviteMembersModalProps {
   isOpen: boolean
@@ -26,6 +27,7 @@ export const InviteMembersModal = ({
       <ModalBody>
         <Heading>Email invite</Heading>
         <Text>Send members an email invitation to join this workspace</Text>
+        <InviteForm />
       </ModalBody>
     </ModalContent>
   </Modal>

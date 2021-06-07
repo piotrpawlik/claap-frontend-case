@@ -1,0 +1,9 @@
+input:focus {
+  border: none;
+  outline: none;
+}
+
+input:focus-visible {
+  border: none;
+  outline: none;
+}
