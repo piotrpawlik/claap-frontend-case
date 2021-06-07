@@ -1,8 +1,9 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useCombobox, useMultipleSelection } from 'downshift'
 import { Wrap, List, ListItem } from '@chakra-ui/react'
 import './Input.css'
-import { searchUser, normalize } from './searchUsers'
+import { searchUser, normalize, User } from './searchUsers'
+import compact from 'lodash/compact'
 
 export const menuStyles = {
   maxHeight: '180px',
@@ -25,7 +26,24 @@ const filterAlreadySelected = (selectedEmails) => (users) =>
 
 export const InviteMembersInput = () => {
   const [inputValue, setInputValue] = useState('')
-  const [filteredItems, setFilteredItems] = useState([])
+  const [searchedItems, setSearchedItems] = useState([])
+  const [typedEmail, setTypedEmail] = useState(null)
+
+  useEffect(() => {
+    const regexp = /(.+)@(.+){2,}\.(.+){2,}/
+    const normalizedInputValue = normalize(inputValue)
+
+    if (normalizedInputValue.match(regexp)) {
+      setTypedEmail({ email: normalizedInputValue })
+    } else {
+      setTypedEmail(null)
+    }
+  }, [inputValue])
+
+  useEffect(() => {
+    searchUser(inputValue).then(setSearchedItems)
+  }, [inputValue])
+
   const {
     getSelectedItemProps,
     getDropdownProps,
@@ -42,23 +60,11 @@ export const InviteMembersInput = () => {
     getItemProps,
     selectItem,
   } = useCombobox({
-    items: filteredItems,
+    items: compact([typedEmail, ...searchedItems]),
     inputValue,
-    onStateChange: async ({ inputValue, type, selectedItem }) => {
+    onStateChange: ({ inputValue, type, selectedItem }) => {
       switch (type) {
         case useCombobox.stateChangeTypes.InputChange:
-          const regexp = /(.+)@(.+){2,}\.(.+){2,}/
-          const normalizedInputValue = normalize(inputValue)
-
-          if (
-            normalizedInputValue.match(regexp) &&
-            !selectedItems.includes(normalizedInputValue)
-          ) {
-            setFilteredItems([{ email: normalizedInputValue }])
-          } else {
-            setFilteredItems([])
-          }
-
           setInputValue(inputValue)
 
           break
@@ -67,9 +73,9 @@ export const InviteMembersInput = () => {
         case useCombobox.stateChangeTypes.InputBlur:
           if (selectedItem) {
             setInputValue('')
-            addSelectedItem(selectedItem.email)
+            addSelectedItem((selectedItem as User).email)
             selectItem(null)
-            setFilteredItems([])
+            setSearchedItems([])
           }
 
           break
@@ -108,17 +114,30 @@ export const InviteMembersInput = () => {
       </div>
       {isOpen && (
         <List {...getMenuProps()}>
-          {filteredItems.map((item, index) => (
+          {typedEmail ? (
             <ListItem
               style={
-                highlightedIndex === index ? { backgroundColor: '#bde4ff' } : {}
+                highlightedIndex === 0 ? { backgroundColor: '#bde4ff' } : {}
               }
-              key={`${item.id}${index}`}
-              {...getItemProps({ item, index })}
+              {...getItemProps({ item: typedEmail, index: 0 })}
             >
-              {item.email}
+              {typedEmail.email}
             </ListItem>
-          ))}
+          ) : null}
+          {searchedItems &&
+            searchedItems.map((item, index) => (
+              <ListItem
+                style={
+                  highlightedIndex === index
+                    ? { backgroundColor: '#bde4ff' }
+                    : {}
+                }
+                key={`${item.id}${index}`}
+                {...getItemProps({ item, index })}
+              >
+                {item.email}
+              </ListItem>
+            ))}
         </List>
       )}
     </div>
