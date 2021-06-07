@@ -4,7 +4,7 @@ import { Wrap, List, ListItem } from '@chakra-ui/react'
 import './Input.css'
 import { searchUser, normalize } from './searchUsers'
 import compact from 'lodash/compact'
-import { User } from './types'
+import { User, KnownUser, UnknownUser } from './types'
 
 export const menuStyles = {
   maxHeight: '180px',
@@ -22,15 +22,15 @@ export const menuStyles = {
 
 export const comboboxStyles = { display: 'inline-block', marginLeft: '5px' }
 
-const notAlreadySelected = (selectedUsers: User[]) => (user: User) =>
-  !selectedUsers.includes(user)
+const notAlreadySelected = (selectedUsers: User[], email: string): boolean =>
+  !selectedUsers.map((user) => user.email).includes(email)
 
 const formatUser = (user: User) => user.email || user.firstName
 
 export const InviteMembersInput = () => {
   const [inputValue, setInputValue] = useState('')
-  const [searchedUsers, setSearchedUsers] = useState<User[]>([])
-  const [unknownUser, setUnkownUser] = useState<User>(null)
+  const [searchedUsers, setSearchedUsers] = useState<KnownUser[]>([])
+  const [unknownUser, setUnkownUser] = useState<UnknownUser>(null)
   const {
     getSelectedItemProps,
     getDropdownProps,
@@ -75,13 +75,13 @@ export const InviteMembersInput = () => {
 
   useEffect(() => {
     const regexp = /(.+)@(.+){2,}\.(.+){2,}/
-    const unknownUser = { email: normalize(inputValue) }
+    const normalizedPossibleEmail = normalize(inputValue)
 
     if (
-      unknownUser.email.match(regexp) &&
-      notAlreadySelected(selectedItems)(unknownUser)
+      normalizedPossibleEmail.match(regexp) &&
+      notAlreadySelected(selectedItems, normalizedPossibleEmail)
     ) {
-      setUnkownUser(unknownUser)
+      setUnkownUser({ email: normalizedPossibleEmail })
     } else {
       setUnkownUser(null)
     }
@@ -89,7 +89,9 @@ export const InviteMembersInput = () => {
 
   useEffect(() => {
     searchUser(inputValue).then((users) => {
-      setSearchedUsers(users.filter(notAlreadySelected(selectedItems)))
+      setSearchedUsers(
+        users.filter((user) => notAlreadySelected(selectedItems, user.email))
+      )
     })
   }, [inputValue, selectedItems])
 

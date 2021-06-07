@@ -1,4 +1,4 @@
-import { User } from './types'
+import { KnownUser } from './types'
 
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
@@ -23,7 +23,7 @@ export const normalize = (input: string): string => {
   return input.trim().toLowerCase()
 }
 
-export const searchUser = async (input: string): Promise<User[]> => {
+export const searchUser = async (input: string): Promise<KnownUser[]> => {
   const normalized = normalize(input)
 
   await delay(200 + Math.random() * 200)
