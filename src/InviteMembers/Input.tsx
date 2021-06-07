@@ -4,6 +4,7 @@ import { Wrap, List, ListItem } from '@chakra-ui/react'
 import './Input.css'
 import { searchUser, normalize, User } from './searchUsers'
 import compact from 'lodash/compact'
+import isString from 'lodash/isString'
 
 export const menuStyles = {
   maxHeight: '180px',
@@ -34,7 +35,7 @@ export const InviteMembersInput = () => {
     const normalizedInputValue = normalize(inputValue)
 
     if (normalizedInputValue.match(regexp)) {
-      setTypedEmail({ email: normalizedInputValue })
+      setTypedEmail(normalizedInputValue)
     } else {
       setTypedEmail(null)
     }
@@ -60,6 +61,10 @@ export const InviteMembersInput = () => {
     getItemProps,
     selectItem,
   } = useCombobox({
+    itemToString: (item) => {
+      if (!item) return ''
+      return isString(item) ? item : (item as User).firstName
+    },
     items: compact([typedEmail, ...searchedItems]),
     inputValue,
     onStateChange: ({ inputValue, type, selectedItem }) => {
@@ -73,9 +78,9 @@ export const InviteMembersInput = () => {
         case useCombobox.stateChangeTypes.InputBlur:
           if (selectedItem) {
             setInputValue('')
-            addSelectedItem((selectedItem as User).email)
             selectItem(null)
             setSearchedItems([])
+            addSelectedItem(selectedItem)
           }
 
           break
@@ -97,7 +102,7 @@ export const InviteMembersInput = () => {
                 key={`selected-item-${index}`}
                 {...getSelectedItemProps({ selectedItem, index })}
               >
-                {selectedItem}
+                {selectedItem['email'] || selectedItem}
                 <span
                   // style={selectedItemIconStyles}
                   onClick={() => removeSelectedItem(selectedItem)}
@@ -121,7 +126,7 @@ export const InviteMembersInput = () => {
               }
               {...getItemProps({ item: typedEmail, index: 0 })}
             >
-              {typedEmail.email}
+              {typedEmail}
             </ListItem>
           ) : null}
           {searchedItems &&
@@ -135,7 +140,7 @@ export const InviteMembersInput = () => {
                 key={`${item.id}${index}`}
                 {...getItemProps({ item, index })}
               >
-                {item.email}
+                {item.firstName}
               </ListItem>
             ))}
         </List>
