@@ -2,9 +2,9 @@ import { useEffect, useState } from 'react'
 import { useCombobox, useMultipleSelection } from 'downshift'
 import { Wrap, List, ListItem } from '@chakra-ui/react'
 import './Input.css'
-import { searchUser, normalize, User } from './searchUsers'
+import { searchUser, normalize } from './searchUsers'
 import compact from 'lodash/compact'
-import isString from 'lodash/isString'
+import { User } from './types'
 
 export const menuStyles = {
   maxHeight: '180px',
@@ -22,36 +22,22 @@ export const menuStyles = {
 
 export const comboboxStyles = { display: 'inline-block', marginLeft: '5px' }
 
-const filterAlreadySelected = (selectedEmails) => (users) =>
-  users.filter((user) => !selectedEmails.includes(user.email))
+const notAlreadySelected = (selectedUsers: User[]) => (user: User) =>
+  !selectedUsers.includes(user)
+
+const formatUser = (user: User) => user.email || user.firstName
 
 export const InviteMembersInput = () => {
   const [inputValue, setInputValue] = useState('')
-  const [searchedItems, setSearchedItems] = useState([])
-  const [typedEmail, setTypedEmail] = useState(null)
-
-  useEffect(() => {
-    const regexp = /(.+)@(.+){2,}\.(.+){2,}/
-    const normalizedInputValue = normalize(inputValue)
-
-    if (normalizedInputValue.match(regexp)) {
-      setTypedEmail(normalizedInputValue)
-    } else {
-      setTypedEmail(null)
-    }
-  }, [inputValue])
-
-  useEffect(() => {
-    searchUser(inputValue).then(setSearchedItems)
-  }, [inputValue])
-
+  const [searchedUsers, setSearchedUsers] = useState<User[]>([])
+  const [unknownUser, setUnkownUser] = useState<User>(null)
   const {
     getSelectedItemProps,
     getDropdownProps,
     addSelectedItem,
     removeSelectedItem,
     selectedItems,
-  } = useMultipleSelection()
+  } = useMultipleSelection<User>()
   const {
     isOpen,
     getMenuProps,
@@ -61,11 +47,8 @@ export const InviteMembersInput = () => {
     getItemProps,
     selectItem,
   } = useCombobox({
-    itemToString: (item) => {
-      if (!item) return ''
-      return isString(item) ? item : (item as User).firstName
-    },
-    items: compact([typedEmail, ...searchedItems]),
+    itemToString: (item) => (item ? formatUser(item) : ''),
+    items: compact([unknownUser, ...searchedUsers]),
     inputValue,
     onStateChange: ({ inputValue, type, selectedItem }) => {
       switch (type) {
@@ -79,7 +62,7 @@ export const InviteMembersInput = () => {
           if (selectedItem) {
             setInputValue('')
             selectItem(null)
-            setSearchedItems([])
+            setSearchedUsers([])
             addSelectedItem(selectedItem)
           }
 
@@ -89,6 +72,26 @@ export const InviteMembersInput = () => {
       }
     },
   })
+
+  useEffect(() => {
+    const regexp = /(.+)@(.+){2,}\.(.+){2,}/
+    const unknownUser = { email: normalize(inputValue) }
+
+    if (
+      unknownUser.email.match(regexp) &&
+      notAlreadySelected(selectedItems)(unknownUser)
+    ) {
+      setUnkownUser(unknownUser)
+    } else {
+      setUnkownUser(null)
+    }
+  }, [inputValue, selectedItems])
+
+  useEffect(() => {
+    searchUser(inputValue).then((users) => {
+      setSearchedUsers(users.filter(notAlreadySelected(selectedItems)))
+    })
+  }, [inputValue, selectedItems])
 
   return (
     <div>
@@ -102,7 +105,7 @@ export const InviteMembersInput = () => {
                 key={`selected-item-${index}`}
                 {...getSelectedItemProps({ selectedItem, index })}
               >
-                {selectedItem['email'] || selectedItem}
+                {formatUser(selectedItem)}
                 <span
                   // style={selectedItemIconStyles}
                   onClick={() => removeSelectedItem(selectedItem)}
@@ -119,18 +122,18 @@ export const InviteMembersInput = () => {
       </div>
       {isOpen && (
         <List {...getMenuProps()}>
-          {typedEmail ? (
+          {unknownUser ? (
             <ListItem
               style={
                 highlightedIndex === 0 ? { backgroundColor: '#bde4ff' } : {}
               }
-              {...getItemProps({ item: typedEmail, index: 0 })}
+              {...getItemProps({ item: unknownUser, index: 0 })}
             >
-              {typedEmail}
+              {unknownUser.email}
             </ListItem>
           ) : null}
-          {searchedItems &&
-            searchedItems.map((item, index) => (
+          {searchedUsers &&
+            searchedUsers.map((item, index) => (
               <ListItem
                 style={
                   highlightedIndex === index

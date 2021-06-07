@@ -1,9 +1,4 @@
-export interface User {
-  firstName: string
-  lastName: string
-  email: string
-  id: string
-}
+import { User } from './types'
 
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
