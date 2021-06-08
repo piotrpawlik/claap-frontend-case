@@ -32,7 +32,7 @@ export const SelectedItem = ({
       </Box>
       <Box color="tomato">{label}</Box>
       <Box ml={3} color="tomato">
-        <CloseIcon onClick={onRemoveClick} w={3} h={3} />
+        <CloseIcon onClick={onRemoveClick} w={3} h={3} cursor="pointer" />
       </Box>
     </Flex>
   )

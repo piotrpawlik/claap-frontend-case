@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useCombobox, useMultipleSelection } from 'downshift'
 import {
   Wrap,
@@ -10,12 +10,14 @@ import {
   Box,
   HStack,
   WrapItem,
+  Portal,
 } from '@chakra-ui/react'
 import './Input.css'
 import { searchUser, normalize } from './searchUsers'
 import compact from 'lodash/compact'
 import { User, KnownUser, UnknownUser } from './types'
 import { SelectedItem } from './SelectedItem'
+import { useMeasure } from 'react-use'
 
 export const menuStyles = {
   maxHeight: '180px',
@@ -132,11 +134,18 @@ export const InviteMembersInput = ({ children }: InviteMembersInputProps) => {
       })
   }, [inputValue])
 
+  const [inputRef, { width: menuWidth }] = useMeasure()
+
   return (
     <div>
-      {/* <div style={comboboxWrapperStyles}> */}
       <Flex align="center">
-        <Flex {...getComboboxProps()} grow={1} bg="gray.900" borderRadius="md">
+        <Flex
+          {...getComboboxProps()}
+          grow={1}
+          bg="gray.900"
+          borderRadius="md"
+          ref={inputRef}
+        >
           <Flex wrap="wrap" p={1}>
             {selectedItems.map((selectedItem, index) => (
               <SelectedItem
@@ -166,35 +175,43 @@ export const InviteMembersInput = ({ children }: InviteMembersInputProps) => {
         </Flex>
         <Box ml={5}>{children({ selectedItems, resetInput: reset })}</Box>
       </Flex>
-      {isOpen && (
-        <List {...getMenuProps()}>
-          {loading ? <ListItem>loading...</ListItem> : null}
-          {unknownUser ? (
-            <ListItem
-              style={
-                highlightedIndex === 0 ? { backgroundColor: '#bde4ff' } : {}
-              }
-              {...getItemProps({ item: unknownUser, index: 0 })}
-            >
-              {unknownUser.email}
-            </ListItem>
-          ) : null}
-          {searchedUsers &&
-            searchedUsers.map((item, index) => (
+      <Box>
+        {isOpen && (
+          <List
+            {...getMenuProps()}
+            bg="gray.900"
+            mt={1}
+            position="absolute"
+            style={{ width: menuWidth }}
+          >
+            {loading ? <ListItem>loading...</ListItem> : null}
+            {unknownUser ? (
               <ListItem
                 style={
-                  highlightedIndex === index
-                    ? { backgroundColor: '#bde4ff' }
-                    : {}
+                  highlightedIndex === 0 ? { backgroundColor: '#bde4ff' } : {}
                 }
-                key={`${item.id}${index}`}
-                {...getItemProps({ item, index })}
+                {...getItemProps({ item: unknownUser, index: 0 })}
               >
-                {item.firstName}
+                {unknownUser.email}
               </ListItem>
-            ))}
-        </List>
-      )}
+            ) : null}
+            {searchedUsers &&
+              searchedUsers.map((item, index) => (
+                <ListItem
+                  style={
+                    highlightedIndex === index
+                      ? { backgroundColor: '#bde4ff' }
+                      : {}
+                  }
+                  key={`${item.id}${index}`}
+                  {...getItemProps({ item, index })}
+                >
+                  {item.firstName}
+                </ListItem>
+              ))}
+          </List>
+        )}
+      </Box>
     </div>
   )
 }
