@@ -136,8 +136,8 @@ export const InviteMembersInput = ({ children }: InviteMembersInputProps) => {
     <div>
       {/* <div style={comboboxWrapperStyles}> */}
       <Flex align="center">
-        <Flex {...getComboboxProps()} grow={1}>
-          <Flex wrap="wrap" border="1px" p={1}>
+        <Flex {...getComboboxProps()} grow={1} bg="gray.900" borderRadius="md">
+          <Flex wrap="wrap" p={1}>
             {selectedItems.map((selectedItem, index) => (
               <SelectedItem
                 key={`selected-item-${index}`}
