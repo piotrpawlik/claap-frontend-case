@@ -13,23 +13,21 @@ export const InviteForm = ({ onSubmit }) => {
 
   return (
     <Box>
-      <HStack>
-        <InviteMembersInput>
-          {({ selectedItems, resetInput }) => {
-            return (
-              <Button
-                isDisabled={isDisabled(selectedItems)}
-                onClick={onInviteClick({
-                  selectedUsers: selectedItems,
-                  resetInput,
-                })}
-              >
-                Invite
-              </Button>
-            )
-          }}
-        </InviteMembersInput>
-      </HStack>
+      <InviteMembersInput>
+        {({ selectedItems, resetInput }) => {
+          return (
+            <Button
+              isDisabled={isDisabled(selectedItems)}
+              onClick={onInviteClick({
+                selectedUsers: selectedItems,
+                resetInput,
+              })}
+            >
+              Invite
+            </Button>
+          )
+        }}
+      </InviteMembersInput>
     </Box>
   )
 }

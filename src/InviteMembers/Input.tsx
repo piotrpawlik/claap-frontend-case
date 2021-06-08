@@ -1,6 +1,16 @@
 import { useEffect, useState } from 'react'
 import { useCombobox, useMultipleSelection } from 'downshift'
-import { Wrap, List, ListItem, useBoolean, Tooltip } from '@chakra-ui/react'
+import {
+  Wrap,
+  List,
+  ListItem,
+  useBoolean,
+  Tooltip,
+  Flex,
+  Box,
+  HStack,
+  WrapItem,
+} from '@chakra-ui/react'
 import './Input.css'
 import { searchUser, normalize } from './searchUsers'
 import compact from 'lodash/compact'
@@ -20,8 +30,6 @@ export const menuStyles = {
   minWidth: '200px',
 }
 
-export const comboboxStyles = { display: 'inline-block', marginLeft: '5px' }
-
 const notAlreadySelected = (selectedUsers: User[], email: string): boolean =>
   !selectedUsers.map((user) => user.email).includes(email)
 
@@ -33,7 +41,7 @@ interface ChildrenProps {
 }
 
 interface InviteMembersInputProps {
-  children: ({ selectedItems, resetInput }: ChildrenProps) => void
+  children: ({ selectedItems, resetInput }: ChildrenProps) => React.ReactNode
 }
 
 export const InviteMembersInput = ({ children }: InviteMembersInputProps) => {
@@ -126,9 +134,9 @@ export const InviteMembersInput = ({ children }: InviteMembersInputProps) => {
   return (
     <div>
       {/* <div style={comboboxWrapperStyles}> */}
-      <div>
-        <div style={comboboxStyles} {...getComboboxProps()}>
-          <Wrap style={{ border: '1px solid black' }}>
+      <Flex align="center">
+        <Flex {...getComboboxProps()} grow={1}>
+          <Flex wrap="wrap" border="1px">
             {selectedItems.map((selectedItem, index) => (
               <span
                 // style={selectedItemStyles}
@@ -151,15 +159,18 @@ export const InviteMembersInput = ({ children }: InviteMembersInputProps) => {
               hasArrow
               colorScheme="red"
             >
-              <input
-                {...getInputProps(
-                  getDropdownProps({ preventKeyAction: isOpen })
-                )}
-              ></input>
+              <span>
+                <input
+                  {...getInputProps(
+                    getDropdownProps({ preventKeyAction: isOpen })
+                  )}
+                />
+              </span>
             </Tooltip>
-          </Wrap>
-        </div>
-      </div>
+          </Flex>
+        </Flex>
+        <Box ml={5}>{children({ selectedItems, resetInput: reset })}</Box>
+      </Flex>
       {isOpen && (
         <List {...getMenuProps()}>
           {loading ? <ListItem>loading...</ListItem> : null}
@@ -189,7 +200,6 @@ export const InviteMembersInput = ({ children }: InviteMembersInputProps) => {
             ))}
         </List>
       )}
-      {children({ selectedItems, resetInput: reset })}
     </div>
   )
 }
