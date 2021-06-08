@@ -15,6 +15,7 @@ import './Input.css'
 import { searchUser, normalize } from './searchUsers'
 import compact from 'lodash/compact'
 import { User, KnownUser, UnknownUser } from './types'
+import { SelectedItem } from './SelectedItem'
 
 export const menuStyles = {
   maxHeight: '180px',
@@ -136,21 +137,15 @@ export const InviteMembersInput = ({ children }: InviteMembersInputProps) => {
       {/* <div style={comboboxWrapperStyles}> */}
       <Flex align="center">
         <Flex {...getComboboxProps()} grow={1}>
-          <Flex wrap="wrap" border="1px">
+          <Flex wrap="wrap" border="1px" p={1}>
             {selectedItems.map((selectedItem, index) => (
-              <span
-                // style={selectedItemStyles}
+              <SelectedItem
                 key={`selected-item-${index}`}
+                label={formatUser(selectedItem)}
+                type={selectedItem.firstName ? 'user' : 'email'}
+                onRemoveClick={() => removeSelectedItem(selectedItem)}
                 {...getSelectedItemProps({ selectedItem, index })}
-              >
-                {formatUser(selectedItem)}
-                <span
-                  // style={selectedItemIconStyles}
-                  onClick={() => removeSelectedItem(selectedItem)}
-                >
-                  &#10005;
-                </span>
-              </span>
+              />
             ))}
             <Tooltip
               label={error}
