@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useCombobox, useMultipleSelection } from 'downshift'
-import { Wrap, List, ListItem } from '@chakra-ui/react'
+import { Wrap, List, ListItem, useBoolean, Tooltip } from '@chakra-ui/react'
 import './Input.css'
 import { searchUser, normalize } from './searchUsers'
 import compact from 'lodash/compact'
@@ -82,8 +82,14 @@ export const InviteMembersInput = ({ children }: InviteMembersInputProps) => {
       }
     },
   })
+  const [loading, setLoading] = useBoolean(false)
+  const [error, setError] = useState(null)
 
   useEffect(() => {
+    if (error) {
+      setError(null)
+    }
+
     const regexp = /(.+)@(.+){2,}\.(.+){2,}/
     const normalizedPossibleEmail = normalize(inputValue)
 
@@ -95,15 +101,27 @@ export const InviteMembersInput = ({ children }: InviteMembersInputProps) => {
     } else {
       setUnkownUser(null)
     }
-  }, [inputValue, selectedItems])
+  }, [inputValue])
 
   useEffect(() => {
-    searchUser(inputValue).then((users) => {
-      setSearchedUsers(
-        users.filter((user) => notAlreadySelected(selectedItems, user.email))
-      )
-    })
-  }, [inputValue, selectedItems])
+    if (inputValue.match(/.*@.*/)) {
+      return
+    }
+
+    setLoading.on()
+    searchUser(inputValue)
+      .then((users) => {
+        setSearchedUsers(
+          users.filter((user) => notAlreadySelected(selectedItems, user.email))
+        )
+      })
+      .then(() => {
+        setLoading.off()
+      })
+      .catch(() => {
+        setError('Error getting list of known users. Please try again.')
+      })
+  }, [inputValue])
 
   return (
     <div>
@@ -126,14 +144,25 @@ export const InviteMembersInput = ({ children }: InviteMembersInputProps) => {
                 </span>
               </span>
             ))}
-            <input
-              {...getInputProps(getDropdownProps({ preventKeyAction: isOpen }))}
-            ></input>
+            <Tooltip
+              label={error}
+              isOpen={error}
+              placement="top"
+              hasArrow
+              colorScheme="red"
+            >
+              <input
+                {...getInputProps(
+                  getDropdownProps({ preventKeyAction: isOpen })
+                )}
+              ></input>
+            </Tooltip>
           </Wrap>
         </div>
       </div>
       {isOpen && (
         <List {...getMenuProps()}>
+          {loading ? <ListItem>loading...</ListItem> : null}
           {unknownUser ? (
             <ListItem
               style={
