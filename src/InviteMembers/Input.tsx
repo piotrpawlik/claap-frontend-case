@@ -27,7 +27,16 @@ const notAlreadySelected = (selectedUsers: User[], email: string): boolean =>
 
 const formatUser = (user: User) => user.email || user.firstName
 
-export const InviteMembersInput = () => {
+interface ChildrenProps {
+  selectedItems: User[]
+  resetInput: () => void
+}
+
+interface InviteMembersInputProps {
+  children: ({ selectedItems, resetInput }: ChildrenProps) => void
+}
+
+export const InviteMembersInput = ({ children }: InviteMembersInputProps) => {
   const [inputValue, setInputValue] = useState('')
   const [searchedUsers, setSearchedUsers] = useState<KnownUser[]>([])
   const [unknownUser, setUnkownUser] = useState<UnknownUser>(null)
@@ -37,6 +46,7 @@ export const InviteMembersInput = () => {
     addSelectedItem,
     removeSelectedItem,
     selectedItems,
+    reset,
   } = useMultipleSelection<User>()
   const {
     isOpen,
@@ -150,6 +160,7 @@ export const InviteMembersInput = () => {
             ))}
         </List>
       )}
+      {children({ selectedItems, resetInput: reset })}
     </div>
   )
 }

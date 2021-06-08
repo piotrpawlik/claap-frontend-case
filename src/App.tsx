@@ -1,14 +1,23 @@
+import React, { useState } from 'react'
 import { ChakraProvider, Button, Flex, useDisclosure } from '@chakra-ui/react'
 import { InviteMembersModal } from './InviteMembers/InviteMembersModal'
+import { User } from './InviteMembers/types'
 
 function App() {
   const { isOpen, onOpen, onClose } = useDisclosure()
 
+  const [invitedMembers, inviteMembers] = useState<User>(null)
+
   return (
     <ChakraProvider>
+      {invitedMembers ? <div>{JSON.stringify(invitedMembers)}</div> : null}
       <Flex align="center" justify="center" style={{ height: '100vh' }}>
         <Button onClick={onOpen}>Invite teammates</Button>
-        <InviteMembersModal isOpen={isOpen} onClose={onClose} />
+        <InviteMembersModal
+          isOpen={isOpen}
+          onClose={onClose}
+          inviteMembers={inviteMembers as () => void}
+        />
       </Flex>
     </ChakraProvider>
   )
