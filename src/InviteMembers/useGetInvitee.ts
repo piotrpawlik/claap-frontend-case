@@ -34,17 +34,15 @@ export const useGetInvitee = ({ inputValue, selectedItems }) => {
       }
     } else {
       setLoading(true)
+      setUnkownUser(null)
       searchUser(inputValue)
         .then((users) => {
+          setLoading(false)
           setSearchedUsers(
             users.filter((user) =>
               notAlreadySelected(selectedItems, user.email)
             )
           )
-        })
-        .then(() => {
-          setLoading(false)
-          setUnkownUser(null)
         })
         .catch(() => {
           setLoading(false)

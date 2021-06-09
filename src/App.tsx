@@ -18,7 +18,9 @@ function App() {
 
   return (
     <ChakraProvider theme={theme}>
-      {invitedMembers ? <div>{JSON.stringify(invitedMembers)}</div> : null}
+      {invitedMembers ? (
+        <div data-testid="invite-result">{JSON.stringify(invitedMembers)}</div>
+      ) : null}
       <Flex align="center" justify="center" style={{ height: '100vh' }}>
         <Button onClick={onOpen}>Invite teammates</Button>
         <InviteMembersModal

@@ -97,7 +97,7 @@ export const InviteMembersInput = ({
         >
           <Wrap p={1} width="100%">
             {selectedItems.map((selectedItem, index) => (
-              <WrapItem>
+              <WrapItem key={index}>
                 <SelectedItem
                   key={`selected-item-${index}`}
                   label={formatUser(selectedItem)}
@@ -108,7 +108,7 @@ export const InviteMembersInput = ({
                 />
               </WrapItem>
             ))}
-            <WrapItem flexGrow={1}>
+            <WrapItem flexGrow={1} key="input">
               <Flex grow={1}>
                 <Tooltip
                   label={error}
@@ -138,6 +138,7 @@ export const InviteMembersInput = ({
                         }
                       }
                     }}
+                    data-testid="invite-input"
                   />
                 </Tooltip>
               </Flex>
@@ -173,7 +174,12 @@ export const InviteMembersInput = ({
                   >
                     <HStack>
                       <InviteeIcon user={item} color={inputAccentColor} />
-                      <Box color={inputAccentColor}>{formatUser(item)}</Box>
+                      <Box
+                        color={inputAccentColor}
+                        data-testid={`list-item-${index}`}
+                      >
+                        {formatUser(item)}
+                      </Box>
                     </HStack>
                   </ListItem>
                 ))}
