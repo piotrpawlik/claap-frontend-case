@@ -118,6 +118,7 @@ export const InviteMembersInput = ({
                   bg="red.400"
                 >
                   <input
+                    tabIndex={1}
                     {...getInputProps(
                       getDropdownProps({ preventKeyAction: isOpen })
                     )}
