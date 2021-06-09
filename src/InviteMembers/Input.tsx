@@ -16,6 +16,7 @@ import { User } from './types'
 import { SelectedItem } from './SelectedItem'
 import { useMeasure } from 'react-use'
 import { useGetInvitee } from './useGetInvitee'
+import { InviteeIcon } from './InviteeIcon'
 
 export const menuStyles = {
   maxHeight: '180px',
@@ -108,7 +109,7 @@ export const InviteMembersInput = ({ children }: InviteMembersInputProps) => {
                 <SelectedItem
                   key={`selected-item-${index}`}
                   label={formatUser(selectedItem)}
-                  type={selectedItem.firstName ? 'user' : 'email'}
+                  user={selectedItem}
                   onRemoveClick={() => removeSelectedItem(selectedItem)}
                   {...getSelectedItemProps({ selectedItem, index })}
                 />
@@ -154,7 +155,10 @@ export const InviteMembersInput = ({ children }: InviteMembersInputProps) => {
                 p={5}
                 {...getItemProps({ item, index })}
               >
-                {formatUser(item)}
+                <HStack>
+                  <InviteeIcon user={item} color="red.400" />
+                  <Box>{formatUser(item)}</Box>
+                </HStack>
               </ListItem>
             ))}
             {isLoading ? (
