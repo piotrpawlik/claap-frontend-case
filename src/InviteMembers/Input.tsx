@@ -155,19 +155,6 @@ export const InviteMembersInput = ({
             position="absolute"
             style={{ width: menuWidth }}
           >
-            {users.map((item, index) => (
-              <ListItem
-                bg={highlightedIndex === index && 'gray.600'}
-                key={index}
-                p={5}
-                {...getItemProps({ item, index })}
-              >
-                <HStack>
-                  <InviteeIcon user={item} color={inputAccentColor} />
-                  <Box color={inputAccentColor}>{formatUser(item)}</Box>
-                </HStack>
-              </ListItem>
-            ))}
             {isLoading ? (
               <ListItem p={5}>
                 <HStack>
@@ -175,7 +162,23 @@ export const InviteMembersInput = ({
                   <Box>loading</Box>
                 </HStack>
               </ListItem>
-            ) : null}
+            ) : (
+              <>
+                {users.map((item, index) => (
+                  <ListItem
+                    bg={highlightedIndex === index && 'gray.600'}
+                    key={index}
+                    p={5}
+                    {...getItemProps({ item, index })}
+                  >
+                    <HStack>
+                      <InviteeIcon user={item} color={inputAccentColor} />
+                      <Box color={inputAccentColor}>{formatUser(item)}</Box>
+                    </HStack>
+                  </ListItem>
+                ))}
+              </>
+            )}
           </List>
         )}
       </Box>
