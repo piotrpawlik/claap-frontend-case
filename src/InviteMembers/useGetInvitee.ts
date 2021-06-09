@@ -47,6 +47,7 @@ export const useGetInvitee = ({ inputValue, selectedItems }) => {
           setUnkownUser(null)
         })
         .catch(() => {
+          setLoading(false)
           setError('Error getting list of known users. Please try again.')
         })
     }
