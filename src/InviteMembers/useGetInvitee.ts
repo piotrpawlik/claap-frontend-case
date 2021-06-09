@@ -2,6 +2,7 @@ import { User, KnownUser, UnknownUser } from './types'
 import { searchUser, normalize } from './searchUsers'
 import { useEffect, useState } from 'react'
 import { useBoolean } from 'react-use'
+import compact from 'lodash/compact'
 
 const notAlreadySelected = (selectedUsers: User[], email: string): boolean =>
   !selectedUsers.map((user) => user.email).includes(email)
@@ -51,5 +52,5 @@ export const useGetInvitee = ({ inputValue, selectedItems }) => {
     }
   }, [inputValue])
 
-  return { searchedUsers, unknownUser, isLoading, error }
+  return { users: compact([unknownUser, ...searchedUsers]), isLoading, error }
 }

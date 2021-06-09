@@ -30,7 +30,7 @@ export const menuStyles = {
   minWidth: '200px',
 }
 
-const formatUser = (user: User) => user.email || user.firstName
+const formatUser = (user: User) => user['firstName'] || user.email
 
 interface ChildrenProps {
   selectedItems: User[]
@@ -51,7 +51,7 @@ export const InviteMembersInput = ({ children }: InviteMembersInputProps) => {
     selectedItems,
     reset,
   } = useMultipleSelection<User>()
-  const { searchedUsers, unknownUser, isLoading, error } = useGetInvitee({
+  const { users, isLoading, error } = useGetInvitee({
     inputValue,
     selectedItems,
   })
@@ -65,7 +65,7 @@ export const InviteMembersInput = ({ children }: InviteMembersInputProps) => {
     selectItem,
   } = useCombobox({
     itemToString: (item) => (item ? formatUser(item) : ''),
-    items: compact([unknownUser, ...searchedUsers]),
+    items: users,
     inputValue,
     onStateChange: ({ inputValue, type, selectedItem }) => {
       switch (type) {
@@ -152,29 +152,16 @@ export const InviteMembersInput = ({ children }: InviteMembersInputProps) => {
             position="absolute"
             style={{ width: menuWidth }}
           >
-            {isLoading ? <ListItem>loading...</ListItem> : null}
-            {unknownUser ? (
+            {users.map((item, index) => (
               <ListItem
                 bg={highlightedIndex === 0 && 'red.100'}
-                {...getItemProps({ item: unknownUser, index: 0 })}
+                key={index}
+                {...getItemProps({ item, index })}
               >
-                {unknownUser.email}
+                {formatUser(item)}
               </ListItem>
-            ) : null}
-            {searchedUsers &&
-              searchedUsers.map((item, index) => (
-                <ListItem
-                  style={
-                    highlightedIndex === index
-                      ? { backgroundColor: '#bde4ff' }
-                      : {}
-                  }
-                  key={`${item.id}${index}`}
-                  {...getItemProps({ item, index })}
-                >
-                  {item.firstName}
-                </ListItem>
-              ))}
+            ))}
+            {isLoading ? <ListItem>loading...</ListItem> : null}
           </List>
         )}
       </Box>
