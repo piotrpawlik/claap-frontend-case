@@ -138,7 +138,7 @@ export const InviteMembersInput = ({ children }: InviteMembersInputProps) => {
                     }
                     style={{
                       height: 30,
-                      width: selectedItems.length === 0 ? '100%' : 100,
+                      width: '100%',
                     }}
                   />
                 </Tooltip>
