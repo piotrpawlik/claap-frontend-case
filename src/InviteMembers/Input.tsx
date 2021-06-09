@@ -18,20 +18,6 @@ import { useMeasure } from 'react-use'
 import { useGetInvitee } from './useGetInvitee'
 import { InviteeIcon } from './InviteeIcon'
 
-export const menuStyles = {
-  maxHeight: '180px',
-  overflowY: 'auto',
-  margin: 0,
-  borderTop: 0,
-  background: 'white',
-  position: 'absolute',
-  zIndex: 1000,
-  listStyle: 'none',
-  padding: 0,
-  left: '185px',
-  minWidth: '200px',
-}
-
 const formatUser = (user: User) => user['firstName'] || user.email
 
 const inputAccentColor = 'red.400'
