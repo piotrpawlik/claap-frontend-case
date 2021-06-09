@@ -119,8 +119,14 @@ export const InviteMembersInput = ({ children }: InviteMembersInputProps) => {
               </WrapItem>
             ))}
             <WrapItem flexGrow={1}>
-              <Tooltip label={error} isOpen={error} placement="top" hasArrow>
-                <Flex grow={1}>
+              <Flex grow={1}>
+                <Tooltip
+                  label={error}
+                  isOpen={error}
+                  placement="top"
+                  hasArrow
+                  bg="red.400"
+                >
                   <input
                     {...getInputProps(
                       getDropdownProps({ preventKeyAction: isOpen })
@@ -135,8 +141,8 @@ export const InviteMembersInput = ({ children }: InviteMembersInputProps) => {
                       width: selectedItems.length === 0 ? '100%' : 100,
                     }}
                   />
-                </Flex>
-              </Tooltip>
+                </Tooltip>
+              </Flex>
             </WrapItem>
           </Wrap>
         </Flex>
