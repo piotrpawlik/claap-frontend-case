@@ -1,22 +1,20 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useCombobox, useMultipleSelection } from 'downshift'
 import {
   List,
   ListItem,
-  useBoolean,
   Tooltip,
   Flex,
   Box,
   Wrap,
   WrapItem,
-  Center,
 } from '@chakra-ui/react'
 import './Input.css'
-import { searchUser, normalize } from './searchUsers'
 import compact from 'lodash/compact'
-import { User, KnownUser, UnknownUser } from './types'
+import { User } from './types'
 import { SelectedItem } from './SelectedItem'
 import { useMeasure } from 'react-use'
+import { useGetInvitee } from './useGetInvitee'
 
 export const menuStyles = {
   maxHeight: '180px',
@@ -32,9 +30,6 @@ export const menuStyles = {
   minWidth: '200px',
 }
 
-const notAlreadySelected = (selectedUsers: User[], email: string): boolean =>
-  !selectedUsers.map((user) => user.email).includes(email)
-
 const formatUser = (user: User) => user.email || user.firstName
 
 interface ChildrenProps {
@@ -48,8 +43,6 @@ interface InviteMembersInputProps {
 
 export const InviteMembersInput = ({ children }: InviteMembersInputProps) => {
   const [inputValue, setInputValue] = useState('')
-  const [searchedUsers, setSearchedUsers] = useState<KnownUser[]>([])
-  const [unknownUser, setUnkownUser] = useState<UnknownUser>(null)
   const {
     getSelectedItemProps,
     getDropdownProps,
@@ -58,6 +51,10 @@ export const InviteMembersInput = ({ children }: InviteMembersInputProps) => {
     selectedItems,
     reset,
   } = useMultipleSelection<User>()
+  const { searchedUsers, unknownUser, isLoading, error } = useGetInvitee({
+    inputValue,
+    selectedItems,
+  })
   const {
     isOpen,
     getMenuProps,
@@ -82,7 +79,6 @@ export const InviteMembersInput = ({ children }: InviteMembersInputProps) => {
           if (selectedItem) {
             setInputValue('')
             selectItem(null)
-            setSearchedUsers([])
             addSelectedItem(selectedItem)
           }
 
@@ -92,48 +88,6 @@ export const InviteMembersInput = ({ children }: InviteMembersInputProps) => {
       }
     },
   })
-  const [loading, setLoading] = useBoolean(false)
-  const [error, setError] = useState(null)
-
-  useEffect(() => {
-    if (error) {
-      setError(null)
-    }
-
-    if (inputValue.match(/.*@.*/)) {
-      const regexp = /(.+)@(.+){2,}\.(.+){2,}/
-      const normalizedPossibleEmail = normalize(inputValue)
-
-      setSearchedUsers([])
-
-      if (
-        normalizedPossibleEmail.match(regexp) &&
-        notAlreadySelected(selectedItems, normalizedPossibleEmail)
-      ) {
-        setUnkownUser({ email: normalizedPossibleEmail })
-      } else {
-        setUnkownUser(null)
-      }
-    } else {
-      setLoading.on()
-      searchUser(inputValue)
-        .then((users) => {
-          setSearchedUsers(
-            users.filter((user) =>
-              notAlreadySelected(selectedItems, user.email)
-            )
-          )
-        })
-        .then(() => {
-          setLoading.off()
-          setUnkownUser(null)
-        })
-        .catch(() => {
-          setError('Error getting list of known users. Please try again.')
-        })
-    }
-  }, [inputValue])
-
   const [inputRef, { width: menuWidth }] = useMeasure()
 
   return (
@@ -198,7 +152,7 @@ export const InviteMembersInput = ({ children }: InviteMembersInputProps) => {
             position="absolute"
             style={{ width: menuWidth }}
           >
-            {loading ? <ListItem>loading...</ListItem> : null}
+            {isLoading ? <ListItem>loading...</ListItem> : null}
             {unknownUser ? (
               <ListItem
                 bg={highlightedIndex === 0 && 'red.100'}
