@@ -159,7 +159,7 @@ export const InviteMembersInput = ({ children }: InviteMembersInputProps) => {
           >
             {users.map((item, index) => (
               <ListItem
-                bg={highlightedIndex === 0 && 'gray.600'}
+                bg={highlightedIndex === index && 'gray.600'}
                 key={index}
                 p={5}
                 {...getItemProps({ item, index })}
