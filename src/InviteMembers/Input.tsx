@@ -29,9 +29,13 @@ interface ChildrenProps {
 
 interface InviteMembersInputProps {
   children: ({ selectedItems, resetInput }: ChildrenProps) => React.ReactNode
+  onSubmit: any
 }
 
-export const InviteMembersInput = ({ children }: InviteMembersInputProps) => {
+export const InviteMembersInput = ({
+  children,
+  onSubmit,
+}: InviteMembersInputProps) => {
   const [inputValue, setInputValue] = useState('')
   const {
     getSelectedItemProps,
@@ -125,6 +129,13 @@ export const InviteMembersInput = ({ children }: InviteMembersInputProps) => {
                     style={{
                       height: 30,
                       width: '100%',
+                    }}
+                    onKeyPress={(e) => {
+                      if (e.key === 'Enter') {
+                        if (selectedItems.length > 0) {
+                          onSubmit(selectedItems)
+                        }
+                      }
                     }}
                   />
                 </Tooltip>

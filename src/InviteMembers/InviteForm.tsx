@@ -12,7 +12,7 @@ export const InviteForm = ({ onSubmit }) => {
   const isDisabled = (selectedUsers) => selectedUsers.length === 0
 
   return (
-    <InviteMembersInput>
+    <InviteMembersInput onSubmit={onSubmit}>
       {({ selectedItems, resetInput }) => {
         return (
           <Button
