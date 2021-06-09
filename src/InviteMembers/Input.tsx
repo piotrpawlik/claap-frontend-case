@@ -8,9 +8,10 @@ import {
   Box,
   Wrap,
   WrapItem,
+  Spinner,
+  HStack,
 } from '@chakra-ui/react'
 import './Input.css'
-import compact from 'lodash/compact'
 import { User } from './types'
 import { SelectedItem } from './SelectedItem'
 import { useMeasure } from 'react-use'
@@ -114,13 +115,7 @@ export const InviteMembersInput = ({ children }: InviteMembersInputProps) => {
               </WrapItem>
             ))}
             <WrapItem flexGrow={1}>
-              <Tooltip
-                label={error}
-                isOpen={error}
-                placement="top"
-                hasArrow
-                colorScheme="red"
-              >
+              <Tooltip label={error} isOpen={error} placement="top" hasArrow>
                 <Flex grow={1}>
                   <input
                     {...getInputProps(
@@ -154,14 +149,22 @@ export const InviteMembersInput = ({ children }: InviteMembersInputProps) => {
           >
             {users.map((item, index) => (
               <ListItem
-                bg={highlightedIndex === 0 && 'red.100'}
+                bg={highlightedIndex === 0 && 'red.400'}
                 key={index}
+                p={5}
                 {...getItemProps({ item, index })}
               >
                 {formatUser(item)}
               </ListItem>
             ))}
-            {isLoading ? <ListItem>loading...</ListItem> : null}
+            {isLoading ? (
+              <ListItem p={5}>
+                <HStack>
+                  <Spinner />
+                  <Box>loading</Box>
+                </HStack>
+              </ListItem>
+            ) : null}
           </List>
         )}
       </Box>
