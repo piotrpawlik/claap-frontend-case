@@ -7,14 +7,14 @@ interface SelectedItemProps {
   onRemoveClick: () => void
   label: 'string'
   user: User
+  color: string
 }
-
-const color = 'red.400'
 
 export const SelectedItem = ({
   onRemoveClick,
   label,
   user,
+  color,
   ...rest
 }: SelectedItemProps) => {
   return (

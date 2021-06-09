@@ -4,7 +4,7 @@ import { Avatar } from '@chakra-ui/react'
 
 interface InviteeIconProps {
   user: User
-  color: string
+  color?: string
 }
 
 export const InviteeIcon = ({ user, color }: InviteeIconProps) => {

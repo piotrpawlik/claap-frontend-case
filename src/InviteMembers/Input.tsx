@@ -34,6 +34,8 @@ export const menuStyles = {
 
 const formatUser = (user: User) => user['firstName'] || user.email
 
+const inputAccentColor = 'red.400'
+
 interface ChildrenProps {
   selectedItems: User[]
   resetInput: () => void
@@ -111,6 +113,7 @@ export const InviteMembersInput = ({ children }: InviteMembersInputProps) => {
                   label={formatUser(selectedItem)}
                   user={selectedItem}
                   onRemoveClick={() => removeSelectedItem(selectedItem)}
+                  color={inputAccentColor}
                   {...getSelectedItemProps({ selectedItem, index })}
                 />
               </WrapItem>
@@ -150,14 +153,14 @@ export const InviteMembersInput = ({ children }: InviteMembersInputProps) => {
           >
             {users.map((item, index) => (
               <ListItem
-                bg={highlightedIndex === 0 && 'red.400'}
+                bg={highlightedIndex === 0 && 'gray.600'}
                 key={index}
                 p={5}
                 {...getItemProps({ item, index })}
               >
                 <HStack>
-                  <InviteeIcon user={item} color="red.400" />
-                  <Box>{formatUser(item)}</Box>
+                  <InviteeIcon user={item} color={inputAccentColor} />
+                  <Box color={inputAccentColor}>{formatUser(item)}</Box>
                 </HStack>
               </ListItem>
             ))}
