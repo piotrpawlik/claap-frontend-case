@@ -100,37 +100,38 @@ export const InviteMembersInput = ({ children }: InviteMembersInputProps) => {
       setError(null)
     }
 
-    const regexp = /(.+)@(.+){2,}\.(.+){2,}/
-    const normalizedPossibleEmail = normalize(inputValue)
-
-    if (
-      normalizedPossibleEmail.match(regexp) &&
-      notAlreadySelected(selectedItems, normalizedPossibleEmail)
-    ) {
-      setUnkownUser({ email: normalizedPossibleEmail })
-    } else {
-      setUnkownUser(null)
-    }
-  }, [inputValue])
-
-  useEffect(() => {
     if (inputValue.match(/.*@.*/)) {
-      return
-    }
+      const regexp = /(.+)@(.+){2,}\.(.+){2,}/
+      const normalizedPossibleEmail = normalize(inputValue)
 
-    setLoading.on()
-    searchUser(inputValue)
-      .then((users) => {
-        setSearchedUsers(
-          users.filter((user) => notAlreadySelected(selectedItems, user.email))
-        )
-      })
-      .then(() => {
-        setLoading.off()
-      })
-      .catch(() => {
-        setError('Error getting list of known users. Please try again.')
-      })
+      setSearchedUsers([])
+
+      if (
+        normalizedPossibleEmail.match(regexp) &&
+        notAlreadySelected(selectedItems, normalizedPossibleEmail)
+      ) {
+        setUnkownUser({ email: normalizedPossibleEmail })
+      } else {
+        setUnkownUser(null)
+      }
+    } else {
+      setLoading.on()
+      searchUser(inputValue)
+        .then((users) => {
+          setSearchedUsers(
+            users.filter((user) =>
+              notAlreadySelected(selectedItems, user.email)
+            )
+          )
+        })
+        .then(() => {
+          setLoading.off()
+          setUnkownUser(null)
+        })
+        .catch(() => {
+          setError('Error getting list of known users. Please try again.')
+        })
+    }
   }, [inputValue])
 
   const [inputRef, { width: menuWidth }] = useMeasure()
@@ -200,9 +201,7 @@ export const InviteMembersInput = ({ children }: InviteMembersInputProps) => {
             {loading ? <ListItem>loading...</ListItem> : null}
             {unknownUser ? (
               <ListItem
-                style={
-                  highlightedIndex === 0 ? { backgroundColor: '#bde4ff' } : {}
-                }
+                bg={highlightedIndex === 0 && 'red.100'}
                 {...getItemProps({ item: unknownUser, index: 0 })}
               >
                 {unknownUser.email}
