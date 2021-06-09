@@ -1,16 +1,15 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useCombobox, useMultipleSelection } from 'downshift'
 import {
-  Wrap,
   List,
   ListItem,
   useBoolean,
   Tooltip,
   Flex,
   Box,
-  HStack,
+  Wrap,
   WrapItem,
-  Portal,
+  Center,
 } from '@chakra-ui/react'
 import './Input.css'
 import { searchUser, normalize } from './searchUsers'
@@ -145,33 +144,47 @@ export const InviteMembersInput = ({ children }: InviteMembersInputProps) => {
           bg="gray.900"
           borderRadius="md"
           ref={inputRef}
+          alignSelf="stretch"
         >
-          <Flex wrap="wrap" p={1}>
+          <Wrap p={1} width="100%">
             {selectedItems.map((selectedItem, index) => (
-              <SelectedItem
-                key={`selected-item-${index}`}
-                label={formatUser(selectedItem)}
-                type={selectedItem.firstName ? 'user' : 'email'}
-                onRemoveClick={() => removeSelectedItem(selectedItem)}
-                {...getSelectedItemProps({ selectedItem, index })}
-              />
-            ))}
-            <Tooltip
-              label={error}
-              isOpen={error}
-              placement="top"
-              hasArrow
-              colorScheme="red"
-            >
-              <span>
-                <input
-                  {...getInputProps(
-                    getDropdownProps({ preventKeyAction: isOpen })
-                  )}
+              <WrapItem>
+                <SelectedItem
+                  key={`selected-item-${index}`}
+                  label={formatUser(selectedItem)}
+                  type={selectedItem.firstName ? 'user' : 'email'}
+                  onRemoveClick={() => removeSelectedItem(selectedItem)}
+                  {...getSelectedItemProps({ selectedItem, index })}
                 />
-              </span>
-            </Tooltip>
-          </Flex>
+              </WrapItem>
+            ))}
+            <WrapItem flexGrow={1}>
+              <Tooltip
+                label={error}
+                isOpen={error}
+                placement="top"
+                hasArrow
+                colorScheme="red"
+              >
+                <Flex grow={1}>
+                  <input
+                    {...getInputProps(
+                      getDropdownProps({ preventKeyAction: isOpen })
+                    )}
+                    placeholder={
+                      selectedItems.length === 0
+                        ? 'Search names or emails...'
+                        : null
+                    }
+                    style={{
+                      height: 30,
+                      width: selectedItems.length === 0 ? '100%' : 100,
+                    }}
+                  />
+                </Flex>
+              </Tooltip>
+            </WrapItem>
+          </Wrap>
         </Flex>
         <Box ml={5}>{children({ selectedItems, resetInput: reset })}</Box>
       </Flex>
